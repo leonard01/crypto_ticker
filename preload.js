@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { ipcRenderer, contextBridge } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
   fetchPrices: async () => {
@@ -11,10 +11,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
       console.error("❌ fetchPrices failed", err);
       throw err;
     }
+  },
+  dragWindow: (newPos) => {
+    if (newPos && typeof newPos.x === "number" && typeof newPos.y === "number") {
+      ipcRenderer.send("drag-window", newPos);
+    } else {
+      console.error("❌ Invalid drag position:", newPos);
+    }
   }
-});
-
-ipcRenderer.on("measure-content", () => {
-  const contentHeight = document.body.scrollHeight;
-  ipcRenderer.send("content-height", contentHeight);
 });

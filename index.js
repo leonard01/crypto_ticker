@@ -3,16 +3,17 @@ const path = require("path");
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 300,
+    width: 260,
     height: 100,
-    frame: false,                  // ✅ No system frame
-    transparent: true,             // ✅ Fully transparent
-    backgroundColor: '#00000000',  // ✅ Force transparent background
-    title: "",                     // ✅ No window title
-    skipTaskbar: true,             // ✅ Hide from Alt+Tab and taskbar
-    focusable: false,              // ✅ OS doesn’t give it focus
+    frame: false,
+    transparent: true,
+    backgroundColor: '#00000000',
+    hasShadow: false,
+    skipTaskbar: true,
     alwaysOnTop: true,
     resizable: false,
+    focusable: true,
+    titleBarStyle: "hidden",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -21,12 +22,9 @@ function createWindow() {
   });
 
   win.loadFile("index.html");
-
-  // Optional: Prevent Windows ghost frame by setting window type
-  win.setAlwaysOnTop(true, "screen-saver");
 }
 
-app.setName(""); // ✅ Strip process name
+app.setName("");
 
 app.whenReady().then(createWindow);
 

@@ -2,17 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title></title> <!-- ✅ Blank title -->
+    <title></title>
     <style>
       html, body {
         margin: 0;
         padding: 0;
-        background: transparent;      /* ✅ Fully transparent background */
+        background: rgba(0, 0, 0, 0.15);    /* ✅ Faint tint for contrast */
+        backdrop-filter: blur(4px);         /* ✅ Moderate blur */
+        -webkit-backdrop-filter: blur(4px);
+        border-radius: 8px;
         color: #ffffff;
         font-family: Arial, sans-serif;
         font-size: 16px;
         -webkit-user-select: none;
-        -webkit-app-region: drag;     /* ✅ Whole widget is draggable */
+        -webkit-app-region: drag;           /* ✅ Entire window is draggable */
       }
 
       #ticker {
@@ -21,6 +24,7 @@
 
       .coin {
         margin: 6px 0;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
       }
 
       .up {
@@ -33,14 +37,13 @@
     </style>
   </head>
   <body>
-    <div id="ticker">Loading...</div>
+    <div id="ticker"></div>
 
     <script>
       async function loadPrices() {
-        const tickerDiv = document.getElementById("ticker");
-        tickerDiv.innerHTML = "Loading...";
         try {
           const prices = await window.electronAPI.fetchPrices();
+          const tickerDiv = document.getElementById("ticker");
           tickerDiv.innerHTML = prices.map(ticker => {
             const coinName = ticker.symbol.replace("USDT", "");
             const price = `$${parseFloat(ticker.lastPrice).toLocaleString()}`;
@@ -58,7 +61,7 @@
             `;
           }).join('');
         } catch (err) {
-          tickerDiv.innerHTML = "<span style='color:red'>Error loading prices</span>";
+          console.error("❌ Failed to fetch prices:", err);
         }
       }
 
