@@ -1,30 +1,41 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 
+let win;
+
+console.log("Preload path: ", path.join(__dirname, "preload.js"))
+
 function createWindow() {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 300,
-    height: 400,
-    frame: false, // No borders
-    transparent: true, // Transparent background
-    alwaysOnTop: true, // Stay above other windows
+    height: 200,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      preload: path.resolve(__dirname, "preload.js"), // ✅ Resolve preload properly
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   });
 
-  win.loadFile("index.html");
+  win.loadFile(path.resolve(__dirname, "index.html")); // ✅ Resolve HTML properly
 }
 
-app.whenReady().then(() => {
-  createWindow();
-
-  app.on("activate", function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+// Shrink window height when header hidden
+ipcMain.on("header-hide", () => {
+  const bounds = win.getBounds();
+  win.setBounds({
+    x: bounds.x,
+    y: bounds.y,
+    width: bounds.width,
+    height: bounds.height - 40,
   });
 });
 
-app.on("window-all-closed", function () {
+app.whenReady().then(createWindow);
+
+app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });

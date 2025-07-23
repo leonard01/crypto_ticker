@@ -6,30 +6,68 @@
     <style>
       body {
         margin: 0;
-        background: rgba(0, 0, 0, 0.8);
-        color: #fff;
+        background: rgba(0, 0, 0, 0.6);
+        color: #ffffff;
         font-family: Arial, sans-serif;
-        font-size: 16px;
-        text-align: center;
+        -webkit-user-select: none;
+        -webkit-app-region: no-drag;
       }
-      #ticker {
-        margin-top: 20px;
+      #header {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 8px;
+        -webkit-app-region: drag;
+        display: flex;
+        justify-content: space-between;
       }
-      .coin {
-        margin: 10px 0;
+      #hide-btn {
+        background: none;
+        border: none;
+        color: #ffffff;
+        cursor: pointer;
+        -webkit-app-region: no-drag;
       }
-      .up {
-        color: #00ff00;
-      }
-      .down {
-        color: #ff0000;
-      }
+      .up { color: #00ff00; }
+      .down { color: #ff0000; }
     </style>
   </head>
   <body>
-    <h2>📈 Crypto Ticker</h2>
+    <div id="header">
+      📈 Crypto Ticker
+      <button id="hide-btn">🡻</button>
+    </div>
     <div id="ticker">Loading...</div>
 
-    <script src="renderer.js"></script>
+    <script>
+        console.log("electronAPI available?", window.electronAPI);
+      document.getElementById("hide-btn").addEventListener("click", () => {
+        document.getElementById("header").style.display = "none";
+        document.body.style.webkitAppRegion = "drag";
+        window.electronAPI.hideHeader();
+      });
+
+      async function loadPrices() {
+        const tickerDiv = document.getElementById("ticker");
+        tickerDiv.innerHTML = "Loading...";
+        try {
+          const prices = await window.electronAPI.fetchPrices();
+          let html = "";
+          prices.forEach((ticker) => {
+            const price = parseFloat(ticker.lastPrice).toLocaleString();
+            const change = parseFloat(ticker.priceChangePercent).toFixed(2);
+            const color = change >= 0 ? "up" : "down";
+            const arrow = change >= 0 ? "▲" : "▼";
+
+            html += `<div><strong>${ticker.symbol}</strong>: ${price} <span class="${color}">${arrow} ${change}%</span></div>`;
+          });
+          tickerDiv.innerHTML = html;
+        } catch (err) {
+          console.error("❌ Renderer error:", err);
+          tickerDiv.innerHTML = "<span style='color:red'>Error loading prices</span>";
+        }
+      }
+
+      loadPrices();
+      setInterval(loadPrices, 5000);
+    </script>
   </body>
 </html>
