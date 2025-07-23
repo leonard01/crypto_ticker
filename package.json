@@ -1,0 +1,27 @@
+{
+  "name": "crypto_ticker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leonard01/crypto_ticker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leonard01/crypto_ticker/issues"
+  },
+  "homepage": "https://github.com/leonard01/crypto_ticker#readme",
+  "dependencies": {
+    "@types/node": "^24.1.0",
+    "axios": "^1.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
