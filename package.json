@@ -1,6 +1,5 @@
 {
-  "name": "crypto_ticker",
-  "version": "1.0.0",
+  "name": "ticker-app",
   "description": "",
   "main": "index.js",
   "scripts": {

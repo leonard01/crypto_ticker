@@ -2,66 +2,62 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Crypto Ticker</title>
+    <title></title> <!-- ✅ Blank title -->
     <style>
-      body {
+      html, body {
         margin: 0;
-        background: rgba(0, 0, 0, 0.6);
+        padding: 0;
+        background: transparent;      /* ✅ Fully transparent background */
         color: #ffffff;
         font-family: Arial, sans-serif;
+        font-size: 16px;
         -webkit-user-select: none;
-        -webkit-app-region: no-drag;
+        -webkit-app-region: drag;     /* ✅ Whole widget is draggable */
       }
-      #header {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 8px;
-        -webkit-app-region: drag;
-        display: flex;
-        justify-content: space-between;
+
+      #ticker {
+        margin: 10px;
       }
-      #hide-btn {
-        background: none;
-        border: none;
-        color: #ffffff;
-        cursor: pointer;
-        -webkit-app-region: no-drag;
+
+      .coin {
+        margin: 6px 0;
       }
-      .up { color: #00ff00; }
-      .down { color: #ff0000; }
+
+      .up {
+        color: #00ff00;
+      }
+
+      .down {
+        color: #ff0000;
+      }
     </style>
   </head>
   <body>
-    <div id="header">
-      📈 Crypto Ticker
-      <button id="hide-btn">🡻</button>
-    </div>
     <div id="ticker">Loading...</div>
 
     <script>
-        console.log("electronAPI available?", window.electronAPI);
-      document.getElementById("hide-btn").addEventListener("click", () => {
-        document.getElementById("header").style.display = "none";
-        document.body.style.webkitAppRegion = "drag";
-        window.electronAPI.hideHeader();
-      });
-
       async function loadPrices() {
         const tickerDiv = document.getElementById("ticker");
         tickerDiv.innerHTML = "Loading...";
         try {
           const prices = await window.electronAPI.fetchPrices();
-          let html = "";
-          prices.forEach((ticker) => {
-            const price = parseFloat(ticker.lastPrice).toLocaleString();
+          tickerDiv.innerHTML = prices.map(ticker => {
+            const coinName = ticker.symbol.replace("USDT", "");
+            const price = `$${parseFloat(ticker.lastPrice).toLocaleString()}`;
             const change = parseFloat(ticker.priceChangePercent).toFixed(2);
-            const color = change >= 0 ? "up" : "down";
             const arrow = change >= 0 ? "▲" : "▼";
+            const colorClass = change >= 0 ? "up" : "down";
 
-            html += `<div><strong>${ticker.symbol}</strong>: ${price} <span class="${color}">${arrow} ${change}%</span></div>`;
-          });
-          tickerDiv.innerHTML = html;
+            return `
+              <div class="coin">
+                <strong>${coinName}</strong>: ${price}
+                <span class="${colorClass}">
+                  ${arrow} ${change}%
+                </span>
+              </div>
+            `;
+          }).join('');
         } catch (err) {
-          console.error("❌ Renderer error:", err);
           tickerDiv.innerHTML = "<span style='color:red'>Error loading prices</span>";
         }
       }
